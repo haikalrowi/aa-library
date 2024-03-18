@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",
+    "prisma-studio": "prisma studio",
     "prisma-db-push-force-reset": "prisma db push --force-reset"
   },
   "dependencies": {
