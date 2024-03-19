@@ -143,7 +143,7 @@ function generateRandomBook() {
 async function main() {
   for (const book of books) {
     await prisma.book.create({
-      data: { ...book, isbn: `${book.isbn}-${Math.random()}` },
+      data: { ...book },
     });
   }
   for (const student of students) {
