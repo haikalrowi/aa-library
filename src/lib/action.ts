@@ -64,3 +64,20 @@ export async function adminCreateBook(formData: FormData) {
   }
   revalidatePath("/admin");
 }
+
+export async function adminUpdateBook(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    await prisma.book.update({
+      data: {
+        isbn: parseInt(formData.get("isbn") as string),
+        title: formData.get("title") as string,
+        author: formData.get("author") as string,
+      },
+      where: { id: formData.get("id") as string },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath("/admin");
+}
