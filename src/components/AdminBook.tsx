@@ -1,3 +1,5 @@
+import { useEffect, useMemo } from "react";
+
 import useCustomReducer from "@/hooks/useCustomReducer";
 import { adminCreateBook } from "@/lib/action";
 import {
@@ -80,18 +82,33 @@ function Create({ hook }: Hook) {
   );
 }
 
-function Search() {
+function Search({ hook }: Hook) {
+  const { dispatch } = hook;
+
   return (
     <Card>
       <CardBody>
-        <Input placeholder="Search by tile, author, ISBN" />
+        <Input
+          placeholder="Search by tile, author, ISBN"
+          onInput={(e) => {
+            const term = e.currentTarget.value;
+            if (term) {
+              dispatch({
+                type: "set",
+                payload: { searching: true, searchTerm: term },
+              });
+            } else {
+              dispatch({ type: "set", payload: { searching: false } });
+            }
+          }}
+        />
       </CardBody>
     </Card>
   );
 }
 
-function Books({ books }: AdminBookProps) {
-  return books.map((book) => (
+function Books({ books }: Partial<AdminBookProps>) {
+  return books?.map((book) => (
     <Card key={book.id}>
       <CardBody>
         <Heading size={"md"}>{book.title}</Heading>
@@ -106,14 +123,15 @@ function Books({ books }: AdminBookProps) {
 }
 
 export function AdminBook({ books }: AdminBookProps) {
-  const hook = useAdminBookState();
+  const hook = useAdminBookState({ books });
+  const { state } = hook;
 
   return (
     <TabPanel>
       <Stack>
         <Create hook={hook} />
-        <Search />
-        <Books books={books} />
+        <Search hook={hook} />
+        <Books books={state.searching ? state.searchResult : books} />
       </Stack>
     </TabPanel>
   );
@@ -123,13 +141,31 @@ type Hook = {
   hook: ReturnType<typeof useAdminBookState>;
 };
 
-function useAdminBookState() {
+function useAdminBookState({ books }: AdminBookProps) {
   type State = Partial<{
     creating: boolean;
     createFormLoading: boolean;
+    searching: boolean;
+    searchTerm: string;
+    searchResult: Prisma.BookGetPayload<{}>[];
   }>;
 
   const { state, dispatch } = useCustomReducer<State>({});
+  const searchBooks = useMemo(() => {
+    const searchTerm = state.searchTerm;
+    if (searchTerm) {
+      return books.filter((book) =>
+        [book.title, book.author, book.isbn.toString()]
+          .map((term) => term.toLowerCase())
+          .some((term) => term.includes(searchTerm.toLowerCase())),
+      );
+    }
+    return books;
+  }, [books, state.searchTerm]);
+
+  useEffect(() => {
+    dispatch({ type: "set", payload: { searchResult: searchBooks } });
+  }, [searchBooks, dispatch]);
 
   return { state, dispatch };
 }
