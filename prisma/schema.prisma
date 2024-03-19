@@ -24,7 +24,7 @@ model Student {
 
 model Book {
   id     String @id @default(uuid())
-  isbn   String @unique
+  isbn   BigInt @unique
   title  String
   author String
 }
