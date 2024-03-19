@@ -38,5 +38,5 @@ model Copy {
 
   bookId String
 
-  book Book @relation(fields: [bookId], references: [id])
+  Book Book @relation(fields: [bookId], references: [id])
 }
