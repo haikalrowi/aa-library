@@ -21,3 +21,10 @@ model Student {
   password String
   name     String
 }
+
+model Book {
+  id     String @id @default(uuid())
+  isbn   String @unique
+  title  String
+  author String
+}
