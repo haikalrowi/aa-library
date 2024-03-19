@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId, useMemo } from "react";
 
 import useCustomReducer from "@/hooks/useCustomReducer";
 import { adminCreateCopy } from "@/lib/action";
@@ -90,18 +90,33 @@ function Create({ hook, books }: HookProps & AdminBookProps) {
   );
 }
 
-function Search() {
+function Search({ hook }: HookProps) {
+  const { dispatch } = hook;
+
   return (
     <Card>
       <CardBody>
-        <Input placeholder="Search by serial, book title" />
+        <Input
+          placeholder="Search by serial, book title"
+          onInput={(e) => {
+            const term = e.currentTarget.value;
+            if (term) {
+              dispatch({
+                type: "set",
+                payload: { searching: true, searchTerm: term },
+              });
+            } else {
+              dispatch({ type: "set", payload: { searching: false } });
+            }
+          }}
+        />
       </CardBody>
     </Card>
   );
 }
 
-function Copy({ copies }: AdminCopyProps) {
-  return copies.map((copy) => (
+function Copy({ copies }: Partial<AdminCopyProps>) {
+  return copies?.map((copy) => (
     <Card key={copy.id}>
       <CardBody>
         <Heading size={"md"}>{copy.Book.title}</Heading>
@@ -116,14 +131,15 @@ function Copy({ copies }: AdminCopyProps) {
 }
 
 export function AdminCopy({ copies, books }: AdminCopyProps & AdminBookProps) {
-  const hook = useAdminCopyState();
+  const hook = useAdminCopyState({ copies });
+  const { state } = hook;
 
   return (
     <TabPanel>
       <Stack>
         <Create hook={hook} books={books} />
-        <Search />
-        <Copy copies={copies} />
+        <Search hook={hook} />
+        <Copy copies={state.searching ? state.searchResult : copies} />
       </Stack>
     </TabPanel>
   );
@@ -133,13 +149,31 @@ type HookProps = {
   hook: ReturnType<typeof useAdminCopyState>;
 };
 
-function useAdminCopyState() {
+function useAdminCopyState({ copies }: AdminCopyProps) {
   type State = Partial<{
     creating: boolean;
     createFormLoading: boolean;
+    searching: boolean;
+    searchTerm: string;
+    searchResult: typeof copies;
   }>;
 
   const { state, dispatch } = useCustomReducer<State>({});
+  const searchResult = useMemo(() => {
+    const searchTerm = state.searchTerm;
+    if (searchTerm) {
+      return copies.filter((copy) =>
+        [copy.serial, copy.Book.title]
+          .map((term) => term.toLowerCase())
+          .some((term) => term.includes(searchTerm.toLowerCase())),
+      );
+    }
+    return copies;
+  }, [copies, state.searchTerm]);
+
+  useEffect(() => {
+    dispatch({ type: "set", payload: { searchResult } });
+  }, [dispatch, searchResult]);
 
   return { state, dispatch };
 }
