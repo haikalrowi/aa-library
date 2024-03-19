@@ -123,3 +123,13 @@ export async function adminUpdateCopy(formData: FormData) {
   }
   revalidatePath(adminPath);
 }
+
+export async function adminDeleteCopy(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    await prisma.copy.delete({ where: { id: formData.get("id") as string } });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath(adminPath);
+}
