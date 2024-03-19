@@ -269,7 +269,7 @@ function useAdminBookState({ books }: AdminBookProps) {
 
   useEffect(() => {
     dispatch({ type: "set", payload: { searchResult: searchBooks } });
-  }, [searchBooks, dispatch]);
+  }, [dispatch, searchBooks]);
 
   return { state, dispatch };
 }
