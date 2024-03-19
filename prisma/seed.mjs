@@ -136,7 +136,7 @@ function generateRandomBook() {
   return {
     title: titles[Math.floor(Math.random() * titles.length)],
     author: authors[Math.floor(Math.random() * authors.length)],
-    isbn: generateISBN(),
+    isbn: parseInt(generateISBN()),
   };
 }
 
