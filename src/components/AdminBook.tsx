@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useContext } from "react";
 
-import useCustomReducer from "@/hooks/useCustomReducer";
+import { AdminBookStateContext, AdminDataContext } from "@/context/Admin";
+import { useAdminBookState } from "@/hooks/Admin";
 import {
   adminCreateBook,
   adminDeleteBook,
@@ -20,14 +21,9 @@ import {
   Text,
   VisuallyHiddenInput,
 } from "@chakra-ui/react";
-import { Prisma } from "@prisma/client";
 
-export type AdminBookProps = {
-  books: Prisma.BookGetPayload<{}>[];
-};
-
-function FormCreate({ hook }: HookProps) {
-  const { state, dispatch } = hook;
+function FormCreate() {
+  const { state, dispatch } = useContext(AdminBookStateContext)!;
 
   return (
     <CardBody>
@@ -70,8 +66,8 @@ function FormCreate({ hook }: HookProps) {
   );
 }
 
-function Create({ hook }: HookProps) {
-  const { state, dispatch } = hook;
+function Create() {
+  const { state, dispatch } = useContext(AdminBookStateContext)!;
 
   return (
     <Card>
@@ -84,13 +80,13 @@ function Create({ hook }: HookProps) {
           Create
         </Button>
       </CardBody>
-      {state.creating && <FormCreate hook={hook} />}
+      {state.creating && <FormCreate />}
     </Card>
   );
 }
 
-function Search({ hook }: HookProps) {
-  const { dispatch } = hook;
+function Search() {
+  const { dispatch } = useContext(AdminBookStateContext)!;
 
   return (
     <Card>
@@ -114,8 +110,8 @@ function Search({ hook }: HookProps) {
   );
 }
 
-function FormUpdate({ hook }: HookProps) {
-  const { state, dispatch } = hook;
+function FormUpdate() {
+  const { state, dispatch } = useContext(AdminBookStateContext)!;
 
   return (
     <CardBody>
@@ -190,10 +186,11 @@ function FormUpdate({ hook }: HookProps) {
   );
 }
 
-function Books({ books, hook }: Partial<AdminBookProps> & HookProps) {
-  const { state, dispatch } = hook;
+function Books() {
+  const { books } = useContext(AdminDataContext);
+  const { state, dispatch } = useContext(AdminBookStateContext)!;
 
-  return books?.map((book) => (
+  return (state.searching ? state.searchResult : books)?.map((book) => (
     <Card key={book.id}>
       <CardBody>
         <Heading size={"md"}>{book.title}</Heading>
@@ -213,63 +210,24 @@ function Books({ books, hook }: Partial<AdminBookProps> & HookProps) {
         </Button>
       </CardBody>
       {state.updating && state.updateCurrentBook?.id === book.id && (
-        <FormUpdate hook={hook} />
+        <FormUpdate />
       )}
     </Card>
   ));
 }
 
-export function AdminBook({ books }: AdminBookProps) {
-  const hook = useAdminBookState({ books });
-  const { state } = hook;
+export function AdminBook() {
+  const state = useAdminBookState();
 
   return (
-    <TabPanel>
-      <Stack>
-        <Create hook={hook} />
-        <Search hook={hook} />
-        <Books
-          books={state.searching ? state.searchResult : books}
-          hook={hook}
-        />
-      </Stack>
-    </TabPanel>
+    <AdminBookStateContext.Provider value={state}>
+      <TabPanel>
+        <Stack>
+          <Create />
+          <Search />
+          <Books />
+        </Stack>
+      </TabPanel>
+    </AdminBookStateContext.Provider>
   );
-}
-
-type HookProps = {
-  hook: ReturnType<typeof useAdminBookState>;
-};
-
-function useAdminBookState({ books }: AdminBookProps) {
-  type State = Partial<{
-    creating: boolean;
-    createFormLoading: boolean;
-    searching: boolean;
-    searchTerm: string;
-    searchResult: typeof books;
-    updating: boolean;
-    updateCurrentBook: (typeof books)[number];
-    updateFormLoading: boolean;
-    deleting: boolean;
-  }>;
-
-  const { state, dispatch } = useCustomReducer<State>({});
-  const searchBooks = useMemo(() => {
-    const searchTerm = state.searchTerm;
-    if (searchTerm) {
-      return books.filter((book) =>
-        [book.title, book.author, book.isbn.toString()]
-          .map((term) => term.toLowerCase())
-          .some((term) => term.includes(searchTerm.toLowerCase())),
-      );
-    }
-    return books;
-  }, [books, state.searchTerm]);
-
-  useEffect(() => {
-    dispatch({ type: "set", payload: { searchResult: searchBooks } });
-  }, [dispatch, searchBooks]);
-
-  return { state, dispatch };
 }
