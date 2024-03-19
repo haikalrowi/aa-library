@@ -6,7 +6,7 @@ import { Button, Tab, TabList, TabPanels, Tabs } from "@chakra-ui/react";
 
 import { AdminBook, AdminBookProps } from "./AdminBook";
 import { AdminCheckout } from "./AdminCheckout";
-import { AdminCopy } from "./AdminCopy";
+import { AdminCopy, AdminCopyProps } from "./AdminCopy";
 import { AdminLogout } from "./AdminLogout";
 
 export function Submit() {
@@ -19,12 +19,15 @@ export function Submit() {
   );
 }
 
-export default function AdminDashboard({ books }: AdminBookProps) {
+export default function AdminDashboard({
+  books,
+  copies,
+}: AdminBookProps & AdminCopyProps) {
   return (
-    <Tabs isFitted className="!flex h-full flex-col">
+    <Tabs isFitted className="!flex h-full flex-col" defaultIndex={1}>
       <TabPanels className="flex-1 overflow-y-scroll">
         <AdminBook books={books} />
-        <AdminCopy />
+        <AdminCopy copies={copies} books={books} />
         <AdminCheckout />
         <AdminLogout />
       </TabPanels>
