@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 
 import useCustomReducer from "@/hooks/useCustomReducer";
-import { adminCreateBook } from "@/lib/action";
+import { adminCreateBook, adminUpdateBook } from "@/lib/action";
 import {
   Badge,
   Button,
@@ -14,6 +14,7 @@ import {
   Stack,
   TabPanel,
   Text,
+  VisuallyHiddenInput,
 } from "@chakra-ui/react";
 import { Prisma } from "@prisma/client";
 
@@ -21,7 +22,7 @@ export type AdminBookProps = {
   books: Prisma.BookGetPayload<{}>[];
 };
 
-function Form({ hook }: Hook) {
+function FormCreate({ hook }: Hook) {
   const { state, dispatch } = hook;
 
   return (
@@ -53,9 +54,9 @@ function Form({ hook }: Hook) {
           </Button>
           <Button
             variant={"ghost"}
-            onClick={() =>
-              dispatch({ type: "set", payload: { creating: false } })
-            }
+            onClick={() => {
+              dispatch({ type: "set", payload: { creating: false } });
+            }}
           >
             Cancel
           </Button>
@@ -72,12 +73,14 @@ function Create({ hook }: Hook) {
     <Card>
       <CardBody>
         <Button
-          onClick={() => dispatch({ type: "set", payload: { creating: true } })}
+          onClick={() => {
+            dispatch({ type: "set", payload: { creating: true } });
+          }}
         >
           Create
         </Button>
       </CardBody>
-      {state.creating && <Form hook={hook} />}
+      {state.creating && <FormCreate hook={hook} />}
     </Card>
   );
 }
@@ -107,7 +110,63 @@ function Search({ hook }: Hook) {
   );
 }
 
-function Books({ books }: Partial<AdminBookProps>) {
+function FormUpdate({ hook }: Hook) {
+  const { state, dispatch } = hook;
+
+  return (
+    <CardBody>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          dispatch({ type: "set", payload: { updateFormLoading: true } });
+          await adminUpdateBook(new FormData(e.currentTarget));
+          dispatch({ type: "reset", payload: {} });
+        }}
+      >
+        <VisuallyHiddenInput
+          value={state.updateCurrentBook?.id}
+          readOnly
+          name="id"
+        />
+        <Stack>
+          <FormControl>
+            <FormLabel>ISBN</FormLabel>
+            <Input
+              type="number"
+              required
+              defaultValue={state.updateCurrentBook?.isbn.toString()}
+              name="isbn"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Title</FormLabel>
+            <Input
+              required
+              defaultValue={state.updateCurrentBook?.title}
+              name="title"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Author</FormLabel>
+            <Input
+              required
+              defaultValue={state.updateCurrentBook?.author}
+              name="author"
+            />
+          </FormControl>
+          <Button type="submit" isLoading={state.updateFormLoading}>
+            Update
+          </Button>
+          <Button variant={"ghost"}>Cancel</Button>
+        </Stack>
+      </form>
+    </CardBody>
+  );
+}
+
+function Books({ books, hook }: Partial<AdminBookProps> & Hook) {
+  const { state, dispatch } = hook;
+
   return books?.map((book) => (
     <Card key={book.id}>
       <CardBody>
@@ -116,8 +175,20 @@ function Books({ books }: Partial<AdminBookProps>) {
         <Text>{book.author}</Text>
       </CardBody>
       <CardBody>
-        <Button>Update</Button>
+        <Button
+          onClick={() => {
+            dispatch({
+              type: "set",
+              payload: { updating: true, updateCurrentBook: book },
+            });
+          }}
+        >
+          Update
+        </Button>
       </CardBody>
+      {state.updating && state.updateCurrentBook?.id === book.id && (
+        <FormUpdate hook={hook} />
+      )}
     </Card>
   ));
 }
@@ -131,7 +202,10 @@ export function AdminBook({ books }: AdminBookProps) {
       <Stack>
         <Create hook={hook} />
         <Search hook={hook} />
-        <Books books={state.searching ? state.searchResult : books} />
+        <Books
+          books={state.searching ? state.searchResult : books}
+          hook={hook}
+        />
       </Stack>
     </TabPanel>
   );
@@ -147,7 +221,10 @@ function useAdminBookState({ books }: AdminBookProps) {
     createFormLoading: boolean;
     searching: boolean;
     searchTerm: string;
-    searchResult: Prisma.BookGetPayload<{}>[];
+    searchResult: typeof books;
+    updating: boolean;
+    updateCurrentBook: (typeof books)[number];
+    updateFormLoading: boolean;
   }>;
 
   const { state, dispatch } = useCustomReducer<State>({});
