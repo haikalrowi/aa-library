@@ -1,6 +1,7 @@
-import { useEffect, useId, useMemo } from "react";
+import { useContext, useId } from "react";
 
-import useCustomReducer from "@/hooks/useCustomReducer";
+import { AdminCopyStateContext, AdminDataContext } from "@/context/Admin";
+import { useAdminCopyState } from "@/hooks/Admin";
 import {
   adminCreateCopy,
   adminDeleteCopy,
@@ -20,16 +21,10 @@ import {
   Text,
   VisuallyHiddenInput,
 } from "@chakra-ui/react";
-import { Prisma } from "@prisma/client";
 
-import { AdminBookProps } from "./AdminBook";
-
-export type AdminCopyProps = {
-  copies: Prisma.CopyGetPayload<{ include: { Book: true } }>[];
-};
-
-function FormCreate({ hook, books }: HookProps & AdminBookProps) {
-  const { state, dispatch } = hook;
+function FormCreate() {
+  const { books } = useContext(AdminDataContext);
+  const { state, dispatch } = useContext(AdminCopyStateContext)!;
 
   const bookIdDatalist = useId();
 
@@ -48,7 +43,7 @@ function FormCreate({ hook, books }: HookProps & AdminBookProps) {
             <FormLabel>Book ID</FormLabel>
             <Input name="bookId" list={bookIdDatalist} />
             <datalist id={bookIdDatalist}>
-              {books.map((book) => (
+              {books?.map((book) => (
                 <option key={book.id} value={book.id}>
                   {[book.isbn.toString(), book.title, book.author].join("; ")}
                 </option>
@@ -76,8 +71,8 @@ function FormCreate({ hook, books }: HookProps & AdminBookProps) {
   );
 }
 
-function Create({ hook, books }: HookProps & AdminBookProps) {
-  const { state, dispatch } = hook;
+function Create() {
+  const { state, dispatch } = useContext(AdminCopyStateContext)!;
 
   return (
     <Card>
@@ -90,13 +85,13 @@ function Create({ hook, books }: HookProps & AdminBookProps) {
           Create
         </Button>
       </CardBody>
-      {state.creating && <FormCreate hook={hook} books={books} />}
+      {state.creating && <FormCreate />}
     </Card>
   );
 }
 
-function Search({ hook }: HookProps) {
-  const { dispatch } = hook;
+function Search() {
+  const { dispatch } = useContext(AdminCopyStateContext)!;
 
   return (
     <Card>
@@ -120,8 +115,8 @@ function Search({ hook }: HookProps) {
   );
 }
 
-function FormUpdate({ hook }: HookProps) {
-  const { state, dispatch } = hook;
+function FormUpdate() {
+  const { state, dispatch } = useContext(AdminCopyStateContext)!;
 
   return (
     <CardBody>
@@ -185,10 +180,11 @@ function FormUpdate({ hook }: HookProps) {
   );
 }
 
-function Copy({ copies, hook }: Partial<AdminCopyProps> & HookProps) {
-  const { state, dispatch } = hook;
+function Copy() {
+  const { copies } = useContext(AdminDataContext);
+  const { state, dispatch } = useContext(AdminCopyStateContext)!;
 
-  return copies?.map((copy) => (
+  return (state.searching ? state.searchResult : copies)?.map((copy) => (
     <Card key={copy.id}>
       <CardBody>
         <Heading size={"md"}>{copy.Book.title}</Heading>
@@ -208,63 +204,24 @@ function Copy({ copies, hook }: Partial<AdminCopyProps> & HookProps) {
         </Button>
       </CardBody>
       {state.updating && state.updateCurrentCopy?.id === copy.id && (
-        <FormUpdate hook={hook} />
+        <FormUpdate />
       )}
     </Card>
   ));
 }
 
-export function AdminCopy({ copies, books }: AdminCopyProps & AdminBookProps) {
-  const hook = useAdminCopyState({ copies });
-  const { state } = hook;
+export function AdminCopy() {
+  const state = useAdminCopyState();
 
   return (
-    <TabPanel>
-      <Stack>
-        <Create hook={hook} books={books} />
-        <Search hook={hook} />
-        <Copy
-          copies={state.searching ? state.searchResult : copies}
-          hook={hook}
-        />
-      </Stack>
-    </TabPanel>
+    <AdminCopyStateContext.Provider value={state}>
+      <TabPanel>
+        <Stack>
+          <Create />
+          <Search />
+          <Copy />
+        </Stack>
+      </TabPanel>
+    </AdminCopyStateContext.Provider>
   );
-}
-
-type HookProps = {
-  hook: ReturnType<typeof useAdminCopyState>;
-};
-
-function useAdminCopyState({ copies }: AdminCopyProps) {
-  type State = Partial<{
-    creating: boolean;
-    createFormLoading: boolean;
-    searching: boolean;
-    searchTerm: string;
-    searchResult: typeof copies;
-    updating: boolean;
-    updateCurrentCopy: (typeof copies)[0];
-    updateFormLoading: boolean;
-    deleting: boolean;
-  }>;
-
-  const { state, dispatch } = useCustomReducer<State>({});
-  const searchResult = useMemo(() => {
-    const searchTerm = state.searchTerm;
-    if (searchTerm) {
-      return copies.filter((copy) =>
-        [copy.serial, copy.Book.title]
-          .map((term) => term.toLowerCase())
-          .some((term) => term.includes(searchTerm.toLowerCase())),
-      );
-    }
-    return copies;
-  }, [copies, state.searchTerm]);
-
-  useEffect(() => {
-    dispatch({ type: "set", payload: { searchResult } });
-  }, [dispatch, searchResult]);
-
-  return { state, dispatch };
 }
