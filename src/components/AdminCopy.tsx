@@ -50,7 +50,7 @@ function FormCreate({ hook, books }: HookProps & AdminBookProps) {
             <datalist id={bookIdDatalist}>
               {books.map((book) => (
                 <option key={book.id} value={book.id}>
-                  {book.isbn.toString()} ({book.title}) ({book.author})
+                  {[book.isbn.toString(), book.title, book.author].join("; ")}
                 </option>
               ))}
             </datalist>
