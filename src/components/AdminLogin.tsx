@@ -1,3 +1,7 @@
+"use client";
+
+import { useFormStatus } from "react-dom";
+
 import { adminLogin } from "@/lib/action";
 import {
   Button,
@@ -8,6 +12,16 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
+
+function Submit() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" isLoading={pending}>
+      Login
+    </Button>
+  );
+}
 
 export default function AdminLogin() {
   return (
@@ -23,7 +37,7 @@ export default function AdminLogin() {
               <FormLabel>Password</FormLabel>
               <Input type="password" name="password" />
             </FormControl>
-            <Button type="submit">Login</Button>
+            <Submit />
           </Stack>
         </form>
       </CardBody>
