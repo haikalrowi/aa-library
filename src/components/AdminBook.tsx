@@ -26,7 +26,7 @@ export type AdminBookProps = {
   books: Prisma.BookGetPayload<{}>[];
 };
 
-function FormCreate({ hook }: Hook) {
+function FormCreate({ hook }: HookProps) {
   const { state, dispatch } = hook;
 
   return (
@@ -70,7 +70,7 @@ function FormCreate({ hook }: Hook) {
   );
 }
 
-function Create({ hook }: Hook) {
+function Create({ hook }: HookProps) {
   const { state, dispatch } = hook;
 
   return (
@@ -89,7 +89,7 @@ function Create({ hook }: Hook) {
   );
 }
 
-function Search({ hook }: Hook) {
+function Search({ hook }: HookProps) {
   const { dispatch } = hook;
 
   return (
@@ -114,7 +114,7 @@ function Search({ hook }: Hook) {
   );
 }
 
-function FormUpdate({ hook }: Hook) {
+function FormUpdate({ hook }: HookProps) {
   const { state, dispatch } = hook;
 
   return (
@@ -190,7 +190,7 @@ function FormUpdate({ hook }: Hook) {
   );
 }
 
-function Books({ books, hook }: Partial<AdminBookProps> & Hook) {
+function Books({ books, hook }: Partial<AdminBookProps> & HookProps) {
   const { state, dispatch } = hook;
 
   return books?.map((book) => (
@@ -237,7 +237,7 @@ export function AdminBook({ books }: AdminBookProps) {
   );
 }
 
-type Hook = {
+type HookProps = {
   hook: ReturnType<typeof useAdminBookState>;
 };
 
