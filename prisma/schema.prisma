@@ -20,6 +20,8 @@ model Student {
   username String @unique
   password String
   name     String
+
+  Checkout Checkout[]
 }
 
 model Book {
@@ -38,5 +40,18 @@ model Copy {
 
   bookId String
 
-  Book Book @relation(fields: [bookId], references: [id])
+  Book     Book       @relation(fields: [bookId], references: [id])
+  Checkout Checkout[]
+}
+
+model Checkout {
+  id       String   @id @default(uuid())
+  returned Boolean  @default(false)
+  dueDate  DateTime
+
+  studentId String
+  copyId    String
+
+  Student Student @relation(fields: [studentId], references: [id])
+  Copy    Copy    @relation(fields: [copyId], references: [id])
 }
