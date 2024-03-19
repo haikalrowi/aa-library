@@ -1,9 +1,135 @@
-import { Stack, TabPanel } from "@chakra-ui/react";
+import useCustomReducer from "@/hooks/useCustomReducer";
+import { adminCreateBook } from "@/lib/action";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Stack,
+  TabPanel,
+  Text,
+} from "@chakra-ui/react";
+import { Prisma } from "@prisma/client";
 
-export function AdminBook() {
+export type AdminBookProps = {
+  books: Prisma.BookGetPayload<{}>[];
+};
+
+function Form({ hook }: Hook) {
+  const { state, dispatch } = hook;
+
+  return (
+    <CardBody>
+      <form
+        action={adminCreateBook}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          dispatch({ type: "set", payload: { createFormLoading: true } });
+          await adminCreateBook(new FormData(e.currentTarget));
+          dispatch({ type: "reset", payload: {} });
+        }}
+      >
+        <Stack>
+          <FormControl>
+            <FormLabel>ISBN</FormLabel>
+            <Input type="number" required name="isbn" />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Title</FormLabel>
+            <Input required name="title" />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Author</FormLabel>
+            <Input required name="author" />
+          </FormControl>
+          <Button type="submit" isLoading={state.createFormLoading}>
+            Create
+          </Button>
+          <Button
+            variant={"ghost"}
+            onClick={() =>
+              dispatch({ type: "set", payload: { creating: false } })
+            }
+          >
+            Cancel
+          </Button>
+        </Stack>
+      </form>
+    </CardBody>
+  );
+}
+
+function Create({ hook }: Hook) {
+  const { state, dispatch } = hook;
+
+  return (
+    <Card>
+      <CardBody>
+        <Button
+          onClick={() => dispatch({ type: "set", payload: { creating: true } })}
+        >
+          Create
+        </Button>
+      </CardBody>
+      {state.creating && <Form hook={hook} />}
+    </Card>
+  );
+}
+
+function Search() {
+  return (
+    <Card>
+      <CardBody>
+        <Input placeholder="Search by tile, author, ISBN" />
+      </CardBody>
+    </Card>
+  );
+}
+
+function Books({ books }: AdminBookProps) {
+  return books.map((book) => (
+    <Card key={book.id}>
+      <CardBody>
+        <Heading size={"md"}>{book.title}</Heading>
+        <Badge>{book.isbn.toString()}</Badge>
+        <Text>{book.author}</Text>
+      </CardBody>
+      <CardBody>
+        <Button>Update</Button>
+      </CardBody>
+    </Card>
+  ));
+}
+
+export function AdminBook({ books }: AdminBookProps) {
+  const hook = useAdminBookState();
+
   return (
     <TabPanel>
-      <Stack></Stack>
+      <Stack>
+        <Create hook={hook} />
+        <Search />
+        <Books books={books} />
+      </Stack>
     </TabPanel>
   );
+}
+
+type Hook = {
+  hook: ReturnType<typeof useAdminBookState>;
+};
+
+function useAdminBookState() {
+  type State = Partial<{
+    creating: boolean;
+    createFormLoading: boolean;
+  }>;
+
+  const { state, dispatch } = useCustomReducer<State>({});
+
+  return { state, dispatch };
 }
