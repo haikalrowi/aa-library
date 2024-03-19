@@ -9,8 +9,9 @@ function Login() {
 
 async function Dashboard() {
   const books = await prisma.book.findMany();
+  const copies = await prisma.copy.findMany({ include: { Book: true } });
 
-  return <AdminDashboard books={books} />;
+  return <AdminDashboard books={books} copies={copies} />;
 }
 
 export default async function Admin() {
