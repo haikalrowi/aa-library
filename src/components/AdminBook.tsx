@@ -41,17 +41,17 @@ function FormCreate({ hook }: Hook) {
         }}
       >
         <Stack>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>ISBN</FormLabel>
-            <Input type="number" required name="isbn" />
+            <Input type="number" name="isbn" />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Title</FormLabel>
-            <Input required name="title" />
+            <Input name="title" />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Author</FormLabel>
-            <Input required name="author" />
+            <Input name="author" />
           </FormControl>
           <Button type="submit" isLoading={state.createFormLoading}>
             Create
@@ -133,27 +133,21 @@ function FormUpdate({ hook }: Hook) {
           name="id"
         />
         <Stack>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>ISBN</FormLabel>
             <Input
               type="number"
-              required
               defaultValue={state.updateCurrentBook?.isbn.toString()}
               name="isbn"
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Title</FormLabel>
-            <Input
-              required
-              defaultValue={state.updateCurrentBook?.title}
-              name="title"
-            />
+            <Input defaultValue={state.updateCurrentBook?.title} name="title" />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Author</FormLabel>
             <Input
-              required
               defaultValue={state.updateCurrentBook?.author}
               name="author"
             />
