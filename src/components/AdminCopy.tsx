@@ -1,7 +1,11 @@
 import { useEffect, useId, useMemo } from "react";
 
 import useCustomReducer from "@/hooks/useCustomReducer";
-import { adminCreateCopy } from "@/lib/action";
+import {
+  adminCreateCopy,
+  adminDeleteCopy,
+  adminUpdateCopy,
+} from "@/lib/action";
 import {
   Badge,
   Button,
@@ -14,6 +18,7 @@ import {
   Stack,
   TabPanel,
   Text,
+  VisuallyHiddenInput,
 } from "@chakra-ui/react";
 import { Prisma } from "@prisma/client";
 
@@ -115,7 +120,74 @@ function Search({ hook }: HookProps) {
   );
 }
 
-function Copy({ copies }: Partial<AdminCopyProps>) {
+function FormUpdate({ hook }: HookProps) {
+  const { state, dispatch } = hook;
+
+  return (
+    <CardBody>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          dispatch({ type: "set", payload: { updateFormLoading: true } });
+          await adminUpdateCopy(new FormData(e.currentTarget));
+          dispatch({ type: "reset", payload: {} });
+        }}
+      >
+        <VisuallyHiddenInput
+          value={state.updateCurrentCopy?.id}
+          readOnly
+          name="id"
+        />
+        <Stack>
+          <FormControl isRequired>
+            <FormLabel>Serial</FormLabel>
+            <Input
+              defaultValue={state.updateCurrentCopy?.serial}
+              name="serial"
+            />
+          </FormControl>
+          <Button
+            type="submit"
+            isLoading={state.updateFormLoading}
+            isDisabled={state.deleting}
+          >
+            Update
+          </Button>
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              dispatch({ type: "set", payload: { updating: false } });
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={"ghost"}
+            colorScheme="red"
+            isLoading={state.deleting}
+            isDisabled={state.updateFormLoading}
+            onClick={async (e) => {
+              e.preventDefault();
+              dispatch({ type: "set", payload: { deleting: true } });
+              const form = e.currentTarget.form;
+              if (!form) {
+                return;
+              }
+              await adminDeleteCopy(new FormData(form));
+              dispatch({ type: "reset", payload: {} });
+            }}
+          >
+            Delete
+          </Button>
+        </Stack>
+      </form>
+    </CardBody>
+  );
+}
+
+function Copy({ copies, hook }: Partial<AdminCopyProps> & HookProps) {
+  const { state, dispatch } = hook;
+
   return copies?.map((copy) => (
     <Card key={copy.id}>
       <CardBody>
@@ -124,8 +196,20 @@ function Copy({ copies }: Partial<AdminCopyProps>) {
         <Text>{copy.available ? "Available" : "Unavailable"}</Text>
       </CardBody>
       <CardBody>
-        <Button>Update</Button>
+        <Button
+          onClick={() => {
+            dispatch({
+              type: "set",
+              payload: { updating: true, updateCurrentCopy: copy },
+            });
+          }}
+        >
+          Update
+        </Button>
       </CardBody>
+      {state.updating && state.updateCurrentCopy?.id === copy.id && (
+        <FormUpdate hook={hook} />
+      )}
     </Card>
   ));
 }
@@ -139,7 +223,10 @@ export function AdminCopy({ copies, books }: AdminCopyProps & AdminBookProps) {
       <Stack>
         <Create hook={hook} books={books} />
         <Search hook={hook} />
-        <Copy copies={state.searching ? state.searchResult : copies} />
+        <Copy
+          copies={state.searching ? state.searchResult : copies}
+          hook={hook}
+        />
       </Stack>
     </TabPanel>
   );
@@ -156,6 +243,10 @@ function useAdminCopyState({ copies }: AdminCopyProps) {
     searching: boolean;
     searchTerm: string;
     searchResult: typeof copies;
+    updating: boolean;
+    updateCurrentCopy: (typeof copies)[0];
+    updateFormLoading: boolean;
+    deleting: boolean;
   }>;
 
   const { state, dispatch } = useCustomReducer<State>({});
