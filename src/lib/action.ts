@@ -1,5 +1,6 @@
 "use server";
 
+import ms from "ms";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -128,6 +129,43 @@ export async function adminDeleteCopy(formData: FormData) {
   try {
     await adminCheckOrThrow();
     await prisma.copy.delete({ where: { id: formData.get("id") as string } });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath(adminPath);
+}
+
+export async function adminCreateCheckout(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    const checkout = await prisma.checkout.create({
+      data: {
+        studentId: formData.get("studentId") as string,
+        copyId: formData.get("copyId") as string,
+        dueDate: new Date(Date.now() + ms("1 week")),
+      },
+    });
+    await prisma.copy.update({
+      data: { available: false },
+      where: { id: checkout.copyId },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath(adminPath);
+}
+
+export async function adminReturnCheckout(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    const checkout = await prisma.checkout.update({
+      data: { returned: true },
+      where: { id: formData.get("id") as string },
+    });
+    await prisma.copy.update({
+      data: { available: true },
+      where: { id: checkout.copyId },
+    });
   } catch (error) {
     console.error(error);
   }
