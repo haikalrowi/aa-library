@@ -91,3 +91,18 @@ export async function adminDeleteBook(formData: FormData) {
   }
   revalidatePath("/admin");
 }
+
+export async function adminCreateCopy(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    await prisma.copy.create({
+      data: {
+        bookId: formData.get("bookId") as string,
+        serial: formData.get("serial") as string,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath("/admin");
+}
