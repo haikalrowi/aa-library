@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { sign, verify } from "./jose";
@@ -39,4 +40,27 @@ export async function adminLogin(formData: FormData) {
 
 export async function adminLogout() {
   cookies().delete("token");
+}
+
+async function adminCheckOrThrow() {
+  const isAdmin = await adminIsAdmin();
+  if (!isAdmin) {
+    throw new Error("Not an admin");
+  }
+}
+
+export async function adminCreateBook(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    await prisma.book.create({
+      data: {
+        isbn: parseInt(formData.get("isbn") as string),
+        title: formData.get("title") as string,
+        author: formData.get("author") as string,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath("/admin");
 }
