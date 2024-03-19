@@ -71,3 +71,40 @@ export function useAdminCopyState() {
 
   return { state, dispatch };
 }
+
+export function useAdminCheckoutState() {
+  type State = Partial<{
+    creating: boolean;
+    createFormLoading: boolean;
+    searching: boolean;
+    searchTerm: string;
+    searchResult: typeof checkouts;
+  }>;
+
+  const { checkouts } = useContext(AdminDataContext);
+  const { state, dispatch } = useCustomReducer<State>({});
+  const searchResult = useMemo(() => {
+    const searchTerm = state.searchTerm;
+    if (searchTerm) {
+      return checkouts?.filter((checkout) =>
+        [
+          checkout.Student.name,
+          checkout.Student.email,
+          checkout.Copy.Book.title,
+          checkout.Copy.Book.author,
+          checkout.Copy.Book.isbn.toString(),
+          checkout.Copy.serial,
+        ]
+          .map((term) => term.toLowerCase())
+          .some((term) => term.includes(searchTerm.toLowerCase())),
+      );
+    }
+    return checkouts;
+  }, [checkouts, state.searchTerm]);
+
+  useEffect(() => {
+    dispatch({ type: "set", payload: { searchResult } });
+  }, [dispatch, searchResult]);
+
+  return { state, dispatch };
+}
