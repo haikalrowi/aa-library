@@ -1,7 +1,11 @@
 import { useEffect, useMemo } from "react";
 
 import useCustomReducer from "@/hooks/useCustomReducer";
-import { adminCreateBook, adminUpdateBook } from "@/lib/action";
+import {
+  adminCreateBook,
+  adminDeleteBook,
+  adminUpdateBook,
+} from "@/lib/action";
 import {
   Badge,
   Button,
@@ -154,7 +158,11 @@ function FormUpdate({ hook }: Hook) {
               name="author"
             />
           </FormControl>
-          <Button type="submit" isLoading={state.updateFormLoading}>
+          <Button
+            type="submit"
+            isLoading={state.updateFormLoading}
+            isDisabled={state.deleting}
+          >
             Update
           </Button>
           <Button
@@ -164,6 +172,23 @@ function FormUpdate({ hook }: Hook) {
             }}
           >
             Cancel
+          </Button>
+          <Button
+            variant={"ghost"}
+            colorScheme="red"
+            isLoading={state.deleting}
+            isDisabled={state.updateFormLoading}
+            onClick={async (e) => {
+              dispatch({ type: "set", payload: { deleting: true } });
+              const form = e.currentTarget.form;
+              if (!form) {
+                return;
+              }
+              await adminDeleteBook(new FormData(form));
+              dispatch({ type: "reset", payload: {} });
+            }}
+          >
+            Delete
           </Button>
         </Stack>
       </form>
@@ -232,6 +257,7 @@ function useAdminBookState({ books }: AdminBookProps) {
     updating: boolean;
     updateCurrentBook: (typeof books)[number];
     updateFormLoading: boolean;
+    deleting: boolean;
   }>;
 
   const { state, dispatch } = useCustomReducer<State>({});
