@@ -143,7 +143,10 @@ function generateRandomBook() {
 async function main() {
   for (const book of books) {
     await prisma.book.create({
-      data: { ...book },
+      data: {
+        ...book,
+        Copy: { create: [{ serial: `s-${Math.random()}` }] },
+      },
     });
   }
   for (const student of students) {
