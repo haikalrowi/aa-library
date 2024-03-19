@@ -157,7 +157,14 @@ function FormUpdate({ hook }: Hook) {
           <Button type="submit" isLoading={state.updateFormLoading}>
             Update
           </Button>
-          <Button variant={"ghost"}>Cancel</Button>
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              dispatch({ type: "set", payload: { updating: false } });
+            }}
+          >
+            Cancel
+          </Button>
         </Stack>
       </form>
     </CardBody>
