@@ -11,6 +11,7 @@ async function Dashboard() {
   const books = await prisma.book.findMany();
   const copies = await prisma.copy.findMany({ include: { Book: true } });
   const checkouts = await prisma.checkout.findMany({
+    where: { returned: false },
     include: {
       Student: { select: { id: true, email: true, name: true } },
       Copy: { include: { Book: true } },
@@ -21,9 +22,14 @@ async function Dashboard() {
   });
   const copiesAvailable = await prisma.copy.findMany({
     where: { available: true },
+    include: { Book: true },
   });
 
-  return <AdminDashboard data={{ books, copies }} />;
+  return (
+    <AdminDashboard
+      data={{ books, copies, checkouts, students, copiesAvailable }}
+    />
+  );
 }
 
 export default async function Admin() {
