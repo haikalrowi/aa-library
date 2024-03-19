@@ -49,6 +49,8 @@ async function adminCheckOrThrow() {
   }
 }
 
+const adminPath = "/admin";
+
 export async function adminCreateBook(formData: FormData) {
   try {
     await adminCheckOrThrow();
@@ -62,7 +64,7 @@ export async function adminCreateBook(formData: FormData) {
   } catch (error) {
     console.error(error);
   }
-  revalidatePath("/admin");
+  revalidatePath(adminPath);
 }
 
 export async function adminUpdateBook(formData: FormData) {
@@ -79,7 +81,7 @@ export async function adminUpdateBook(formData: FormData) {
   } catch (error) {
     console.error(error);
   }
-  revalidatePath("/admin");
+  revalidatePath(adminPath);
 }
 
 export async function adminDeleteBook(formData: FormData) {
@@ -89,7 +91,7 @@ export async function adminDeleteBook(formData: FormData) {
   } catch (error) {
     console.error(error);
   }
-  revalidatePath("/admin");
+  revalidatePath(adminPath);
 }
 
 export async function adminCreateCopy(formData: FormData) {
@@ -104,5 +106,20 @@ export async function adminCreateCopy(formData: FormData) {
   } catch (error) {
     console.error(error);
   }
-  revalidatePath("/admin");
+  revalidatePath(adminPath);
+}
+
+export async function adminUpdateCopy(formData: FormData) {
+  try {
+    await adminCheckOrThrow();
+    await prisma.copy.update({
+      data: {
+        serial: formData.get("serial") as string,
+      },
+      where: { id: formData.get("id") as string },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  revalidatePath(adminPath);
 }
