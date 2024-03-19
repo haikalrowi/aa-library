@@ -27,4 +27,16 @@ model Book {
   isbn   BigInt @unique
   title  String
   author String
+
+  Copy Copy[]
+}
+
+model Copy {
+  id        String  @id @default(uuid())
+  serial    String  @unique
+  available Boolean @default(true)
+
+  bookId String
+
+  book Book @relation(fields: [bookId], references: [id])
 }
