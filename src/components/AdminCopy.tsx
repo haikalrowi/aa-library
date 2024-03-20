@@ -210,7 +210,7 @@ function Copy() {
   ));
 }
 
-export function AdminCopy() {
+export default function AdminCopy() {
   const state = useAdminCopyState();
 
   return (
