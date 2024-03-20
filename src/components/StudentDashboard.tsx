@@ -12,7 +12,7 @@ export default function StudentDashboard({ data }: { data: StudentData }) {
   return (
     <StudentDataContext.Provider value={data}>
       <Tabs isFitted className="!flex h-full flex-col">
-        <TabPanels className="flex-1">
+        <TabPanels className="flex-1 overflow-y-scroll">
           <StudentBook />
           <StudentCheckout />
           <SharedLogout form={{ action: studentLogout }} />
