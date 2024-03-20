@@ -14,7 +14,7 @@ export default function App() {
       <Card className="relative">
         <CardBody>
           <Heading>Student</Heading>
-          <Link href="/admin" className="absolute inset-0" />
+          <Link href="/student" className="absolute inset-0" />
         </CardBody>
       </Card>
     </Stack>
