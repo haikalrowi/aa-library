@@ -3,19 +3,19 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL_MONGO")
 }
 
 model Admin {
-  id       String @id @default(uuid())
+  id       String @id @default(uuid()) @map("_id")
   email    String @unique
   username String @unique
   password String
 }
 
 model Student {
-  id       String @id @default(uuid())
+  id       String @id @default(uuid()) @map("_id")
   email    String @unique
   username String @unique
   password String
@@ -25,7 +25,7 @@ model Student {
 }
 
 model Book {
-  id     String @id @default(uuid())
+  id     String @id @default(uuid()) @map("_id")
   isbn   BigInt @unique
   title  String
   author String
@@ -34,7 +34,7 @@ model Book {
 }
 
 model Copy {
-  id        String  @id @default(uuid())
+  id        String  @id @default(uuid()) @map("_id")
   serial    String  @unique
   available Boolean @default(true)
 
@@ -45,7 +45,7 @@ model Copy {
 }
 
 model Checkout {
-  id       String   @id @default(uuid())
+  id       String   @id @default(uuid()) @map("_id")
   returned Boolean  @default(false)
   dueDate  DateTime
 
