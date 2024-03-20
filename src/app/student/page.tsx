@@ -13,6 +13,8 @@ async function Dashboard(props: { studentId: string }) {
   });
   const checkouts = await prisma.checkout.findMany({
     where: { studentId: props.studentId },
+    include: { Copy: { include: { Book: true } } },
+    orderBy: { returned: "asc" },
   });
 
   return <StudentDashboard data={{ books, checkouts }} />;
