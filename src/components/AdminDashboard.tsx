@@ -1,12 +1,13 @@
 "use client";
 
 import { AdminData, AdminDataContext } from "@/context/Admin";
+import { adminLogout } from "@/lib/action";
 import { Tab, TabList, TabPanels, Tabs } from "@chakra-ui/react";
 
 import AdminBook from "./AdminBook";
 import AdminCheckout from "./AdminCheckout";
 import AdminCopy from "./AdminCopy";
-import AdminLogout from "./AdminLogout";
+import SharedLogout from "./SharedLogout";
 
 export default function AdminDashboard({ data }: { data: AdminData }) {
   return (
@@ -16,7 +17,7 @@ export default function AdminDashboard({ data }: { data: AdminData }) {
           <AdminBook />
           <AdminCopy />
           <AdminCheckout />
-          <AdminLogout />
+          <SharedLogout form={{ action: adminLogout }} />
         </TabPanels>
         <TabList className="flex-none">
           <Tab>Book</Tab>
