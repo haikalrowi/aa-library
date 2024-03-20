@@ -6,7 +6,7 @@ export default function App() {
   return (
     <Stack>
       <Link href="/admin">Admin</Link>
-      <Link href="/user">Student</Link>
+      <Link href="/student">Student</Link>
     </Stack>
   );
 }
