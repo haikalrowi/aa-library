@@ -1,9 +1,9 @@
-import { Stack } from "@chakra-ui/react";
+import SharedLayout from "@/components/SharedLayout";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <Stack className="h-screen justify-center">{children}</Stack>;
+  return <SharedLayout>{children}</SharedLayout>;
 }
