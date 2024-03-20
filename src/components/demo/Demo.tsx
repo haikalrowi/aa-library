@@ -2,7 +2,7 @@ import { Card, CardBody, Code, Heading, Text } from "@chakra-ui/react";
 
 export function DemoBanner() {
   return (
-    <Card size={"sm"} className="!fixed -top-2 right-4">
+    <Card size={"sm"} className="!fixed -top-2 right-4 z-10">
       <CardBody>
         <Heading size="sm">Demo</Heading>
       </CardBody>
