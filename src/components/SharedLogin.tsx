@@ -34,7 +34,7 @@ export default function SharedLogin({
         <form action={form.action}>
           <Stack>
             <FormControl>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email/Username</FormLabel>
               <Input name="username" />
             </FormControl>
             <FormControl>
