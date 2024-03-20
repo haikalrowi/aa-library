@@ -158,7 +158,7 @@ function Checkout() {
   ));
 }
 
-export function AdminCheckout() {
+export default function AdminCheckout() {
   const state = useAdminCheckoutState();
 
   return (
