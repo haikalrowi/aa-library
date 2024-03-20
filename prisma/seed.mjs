@@ -163,7 +163,15 @@ main()
         password: "admin",
       },
     });
-    console.log(admin);
+    const student = await prisma.student.create({
+      data: {
+        email: "student@localhost",
+        username: "student",
+        password: "student",
+        name: "Student",
+      },
+    });
+    console.log({ admin, student });
   })
   .then(async () => {
     await prisma.$disconnect();
