@@ -10,16 +10,6 @@ import { AdminCheckout } from "./AdminCheckout";
 import { AdminCopy } from "./AdminCopy";
 import { AdminLogout } from "./AdminLogout";
 
-export function Submit() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" isLoading={pending}>
-      Logout
-    </Button>
-  );
-}
-
 export default function AdminDashboard({ data }: { data: AdminData }) {
   return (
     <AdminDataContext.Provider value={data}>
