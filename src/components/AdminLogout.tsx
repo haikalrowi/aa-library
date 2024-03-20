@@ -13,7 +13,7 @@ function Submit() {
   );
 }
 
-export function AdminLogout() {
+export default function AdminLogout() {
   return (
     <TabPanel>
       <Card>
