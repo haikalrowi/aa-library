@@ -25,9 +25,12 @@ export async function adminIsAdmin() {
 export async function adminLogin(formData: FormData) {
   let token;
   try {
-    const admin = await prisma.admin.findUniqueOrThrow({
+    const admin = await prisma.admin.findFirstOrThrow({
       where: {
-        username: formData.get("username") as string,
+        OR: [
+          { email: formData.get("username") as string },
+          { username: formData.get("username") as string },
+        ],
         password: formData.get("password") as string,
       },
     });
@@ -170,4 +173,43 @@ export async function adminReturnCheckout(formData: FormData) {
     console.error(error);
   }
   revalidatePath(adminPath);
+}
+
+export async function studentIsStudent() {
+  const token = cookies().get("token")?.value;
+  try {
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const { id } = await verify(token);
+    await prisma.student.findUniqueOrThrow({ where: { id } });
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+  return true;
+}
+
+export async function studentLogin(formData: FormData) {
+  let token;
+  try {
+    const admin = await prisma.student.findFirstOrThrow({
+      where: {
+        OR: [
+          { email: formData.get("username") as string },
+          { username: formData.get("username") as string },
+        ],
+        password: formData.get("password") as string,
+      },
+    });
+    token = await sign({ id: admin.id });
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+  cookies().set("token", token);
+}
+
+export async function studentLogout() {
+  cookies().delete("token");
 }
