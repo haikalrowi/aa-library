@@ -47,7 +47,9 @@ function Checkout() {
   return (state.searching ? state.searchResult : checkouts)?.map((checkout) => (
     <Card key={checkout.id}>
       <CardBody>
-        <Badge>{checkout.returned ? "Returned" : "Not Returned"}</Badge>
+        <Text className="text-right">
+          <Badge>{checkout.returned ? "Returned" : "Not Returned"}</Badge>
+        </Text>
         <Heading size={"md"}>{checkout.Copy.Book.title}</Heading>
         <Badge>{checkout.Copy.Book.isbn.toString()}</Badge>
         <Text>{checkout.Copy.Book.author}</Text>
