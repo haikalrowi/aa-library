@@ -216,7 +216,7 @@ function Books() {
   ));
 }
 
-export function AdminBook() {
+export default function AdminBook() {
   const state = useAdminBookState();
 
   return (
