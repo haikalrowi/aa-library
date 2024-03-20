@@ -1,9 +1,7 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
-
 import { AdminData, AdminDataContext } from "@/context/Admin";
-import { Button, Tab, TabList, TabPanels, Tabs } from "@chakra-ui/react";
+import { Tab, TabList, TabPanels, Tabs } from "@chakra-ui/react";
 
 import { AdminBook } from "./AdminBook";
 import { AdminCheckout } from "./AdminCheckout";
