@@ -7,15 +7,15 @@ function Login() {
   return <SharedLogin form={{ action: studentLogin }} />;
 }
 
-function Dashboard(props: { studentId: string }) {
-  const books = prisma.book.findMany({
+async function Dashboard(props: { studentId: string }) {
+  const books = await prisma.book.findMany({
     where: { Copy: { some: { available: true } } },
   });
-  const checkouts = prisma.checkout.findMany({
+  const checkouts = await prisma.checkout.findMany({
     where: { studentId: props.studentId },
   });
 
-  return <StudentDashboard />;
+  return <StudentDashboard data={{ books, checkouts }} />;
 }
 
 export default async function Student() {
