@@ -177,17 +177,22 @@ export async function adminReturnCheckout(formData: FormData) {
 
 export async function studentIsStudent() {
   const token = cookies().get("token")?.value;
+  let studentId;
   try {
     if (!token) {
       throw new Error("No token found");
     }
     const { id } = await verify(token);
+    if (!id) {
+      throw new Error("No id found");
+    }
     await prisma.student.findUniqueOrThrow({ where: { id } });
+    studentId = id;
   } catch (error) {
     console.error(error);
-    return false;
+    return { isStudent: false } as const;
   }
-  return true;
+  return { isStudent: true, studentId } as const;
 }
 
 export async function studentLogin(formData: FormData) {
