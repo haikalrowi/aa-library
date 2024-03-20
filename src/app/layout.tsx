@@ -2,6 +2,7 @@ import "@/ui/global.css";
 
 import type { Metadata } from "next";
 
+import DEMO, { DemoBanner } from "@/components/demo";
 import { ColorModeScript, Provider } from "@/ui/chakra";
 import { config } from "@/ui/chakra-config";
 
@@ -18,7 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Provider>{children}</Provider>
+        <Provider>
+          {DEMO && <DemoBanner />}
+          {children}
+        </Provider>
         <ColorModeScript initialColorMode={config.initialColorMode} />
       </body>
     </html>

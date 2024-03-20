@@ -1,10 +1,16 @@
+import DEMO, { DemoStudentLogin } from "@/components/demo";
 import SharedLogin from "@/components/SharedLogin";
 import StudentDashboard from "@/components/StudentDashboard";
 import { studentIsStudent, studentLogin } from "@/lib/action";
 import prisma from "@/lib/prisma";
 
 function Login() {
-  return <SharedLogin form={{ action: studentLogin }} />;
+  return (
+    <>
+      {DEMO && <DemoStudentLogin />}
+      <SharedLogin form={{ action: studentLogin }} />
+    </>
+  );
 }
 
 async function Dashboard(props: { studentId: string }) {

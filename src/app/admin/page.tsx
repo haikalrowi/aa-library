@@ -1,10 +1,16 @@
 import AdminDashboard from "@/components/AdminDashboard";
+import DEMO, { DemoAdminLogin } from "@/components/demo";
 import SharedLogin from "@/components/SharedLogin";
 import { adminIsAdmin, adminLogin } from "@/lib/action";
 import prisma from "@/lib/prisma";
 
 function Login() {
-  return <SharedLogin form={{ action: adminLogin }} />;
+  return (
+    <>
+      {DEMO && <DemoAdminLogin />}
+      <SharedLogin form={{ action: adminLogin }} />
+    </>
+  );
 }
 
 async function Dashboard() {

@@ -1,3 +1,5 @@
+import { useContext } from "react";
+
 import {
   StudentCheckoutStateContext,
   StudentDataContext,
@@ -13,7 +15,6 @@ import {
   TabPanel,
   Text,
 } from "@chakra-ui/react";
-import { useContext } from "react";
 
 function Search() {
   const { dispatch } = useContext(StudentCheckoutStateContext)!;
