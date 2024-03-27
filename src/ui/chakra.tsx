@@ -1,10 +1,18 @@
 "use client";
 
-import { ChakraProvider, Container, extendTheme } from "@chakra-ui/react";
+import {
+  ChakraProvider,
+  Container,
+  extendTheme,
+  ThemeConfig,
+} from "@chakra-ui/react";
 
-import { config } from "./chakra-config";
+type ProviderProps = {
+  children: React.ReactNode;
+  config: ThemeConfig;
+};
 
-export function Provider({ children }: { children: React.ReactNode }) {
+export function Provider({ children, config }: ProviderProps) {
   const theme = extendTheme({ config });
 
   return (
@@ -13,5 +21,3 @@ export function Provider({ children }: { children: React.ReactNode }) {
     </ChakraProvider>
   );
 }
-
-export { ColorModeScript } from "@chakra-ui/react";

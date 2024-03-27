@@ -3,8 +3,8 @@ import "@/ui/global.css";
 import type { Metadata } from "next";
 
 import DEMO, { DemoBanner } from "@/components/demo";
-import { ColorModeScript, Provider } from "@/ui/chakra";
-import { config } from "@/ui/chakra-config";
+import { Provider } from "@/ui/chakra";
+import { ColorModeScript, ThemeConfig } from "@chakra-ui/react";
 
 export const metadata: Metadata = {
   title: "AA Library",
@@ -16,10 +16,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config: ThemeConfig = {
+    initialColorMode: "dark",
+    useSystemColorMode: false,
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Provider>
+        <Provider config={config}>
           {DEMO && <DemoBanner />}
           {children}
         </Provider>
