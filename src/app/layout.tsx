@@ -2,7 +2,7 @@ import "@/ui/global.css";
 
 import type { Metadata } from "next";
 
-import DEMO, { DemoBanner } from "@/components/demo";
+import { demo } from "@/config";
 import { Provider } from "@/ui/chakra";
 import { ColorModeScript, ThemeConfig } from "@chakra-ui/react";
 
@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <Provider config={config}>
-          {DEMO && <DemoBanner />}
+          {demo.enabled && <demo.DemoBanner />}
           {children}
         </Provider>
         <ColorModeScript initialColorMode={config.initialColorMode} />

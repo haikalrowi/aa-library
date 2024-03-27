@@ -1,13 +1,13 @@
-import DEMO, { DemoStudentLogin } from "@/components/demo";
 import SharedLogin from "@/components/SharedLogin";
 import StudentDashboard from "@/components/StudentDashboard";
+import { demo } from "@/config";
 import { studentIsStudent, studentLogin } from "@/lib/action";
 import prisma from "@/lib/prisma";
 
 function Login() {
   return (
     <>
-      {DEMO && <DemoStudentLogin />}
+      {demo.enabled && <demo.DemoStudentLogin />}
       <SharedLogin form={{ action: studentLogin }} />
     </>
   );
